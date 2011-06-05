@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+	<string name="apptitle">snapamigo</string>
+	<string name="no_network_title">ネットワーク接続が必要です。</string>
+	<string name="no_network_msg">ネットワークが見つかりません。</string>
+	<string name="twitter_time_lessminute">数秒前</string>
+	<string name="twitter_minuteago">1 分前</string>
+	<string name="twitter_minutesago"> 分前</string>
+	<string name="twitter_hourago">約 1 時間前</string>
+	<string name="twitter_aboutnum">約 </string>
+	<string name="twitter_hoursago"> 時間前</string>
+	<string name="twitter_oneday">1 日前</string>
+	<string name="twitter_daysago"> 日前</string>
+	<string name="twitter_monthago">約 1 ヵ月前</string>
+	<string name="twitter_monthsago"> ヵ月前</string>
+	<string name="twitter_yearago">約 1 年前</string>
+	<string name="twitter_over">over </string>
+	<string name="twitter_yearsago"> 年前</string>
+</resources>
