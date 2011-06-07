@@ -106,6 +106,7 @@ cc.cameraContainer.addEventListener('click', function(){
 				var uploadwin = Titanium.UI.createWindow({
 					url:'../javascript/upload_photo.js',  
 				    title:'Upload',
+				    barColor:useThisBarColor,
 				    backgroundColor:useThisBackgroundColor				
 				});
 				uploadwin.tab = tab;
@@ -184,6 +185,7 @@ cc.photoContainer.addEventListener('click', function(){
 			var uploadwin = Titanium.UI.createWindow({
 				url:targetjs,  
 			    title:'Upload',
+			    barColor:useThisBarColor,
 			    backgroundColor:useThisBackgroundColor				
 			});
 			var tmp_image;

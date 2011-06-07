@@ -83,8 +83,10 @@ function uploadToServer(image) {
 		//	title: 'Feed'
 		//});
 		//homewin.open();
+		Ti.App.fireEvent('hide_indicator',{});
 		Titanium.UI.currentWindow.close();
 		tabGroup.setActiveTab(0);
+		Ti.App.fireEvent('snaps_loadFeed',{});
 				
 	});    
 }

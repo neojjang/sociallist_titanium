@@ -78,6 +78,7 @@ function getTableData(data){
                 var photo_detailwin = Titanium.UI.createWindow({
 					url:'../javascript/photo_detail.js',  
 				    title:'Photo Detail',
+				    barColor:useThisBarColor,
 				    backgroundColor:useThisBackgroundColor,
 					userimageUrl: data[e.source.row].snap.user_photo,
 					mediumimageUrl:	data[e.source.row].snap.photo_medium_url,
@@ -433,7 +434,14 @@ function endReloading() {
   Ti.App.fireEvent('hide_indicator',{});
 }
 
+Ti.App.addEventListener('snaps_loadFeed', function(e) {
+  Ti.App.fireEvent('show_indicator');	
+  loadFeed(url);
+  setTimeout(endReloading, 2000);
+});
+
 if (isLogin()) {
 	Ti.App.fireEvent('show_indicator');
 	loadFeed(url);
+	setTimeout(endReloading, 2000);
 }

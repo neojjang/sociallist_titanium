@@ -195,8 +195,10 @@ doneLabel.addEventListener(
 			snap_title,
 			created_at
 			);
+		Ti.App.fireEvent('hide_indicator',{});	
 		Titanium.UI.currentWindow.close();
-		tabGroup.setActiveTab(0);	 			         
+		tabGroup.setActiveTab(0);
+		Ti.App.fireEvent('snaps_loadFeed',{});	 			         
     }
 );
 
