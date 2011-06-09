@@ -20,8 +20,8 @@ var tab = cc.win.tab;
 //	Ti.UI.currentTab.open(welcomewin, { animated : true});
 //}
 
-var url = "https://handuplist.com/homefeed.json";
-var filename = "homefeed.json";
+var url = "https://handuplist.com/index.json";
+var filename = "index.json";
 var imageCache = new ImageWithCache();
 
 cc.win.orientationModes = [
@@ -38,6 +38,50 @@ cc.tableView = Ti.UI.createTableView({
 	width: Ti.Platform.displayCaps.platformWidth
 });
 cc.win.add(cc.tableView);
+
+var distance_label = Ti.UI.createLabel({
+	text: 'Within 0.0 mile',
+	left:5,		
+	height:'auto',
+	width:Ti.Platform.displayCaps.platformWidth * 0.3,
+	textAlign:'left',
+	color:'#ffffff',			
+	font:{fontFamily:'Trebuchet MS',fontSize:12,fontWeight:'bold'}
+});
+var toolbarSlider = Titanium.UI.createSlider({
+	min:0,
+	max:10,
+	value:0.1,
+	width:Ti.Platform.displayCaps.platformWidth * 0.6,
+	right:10,
+	height:'auto'
+});
+cc.win.setToolbar([distance_label,toolbarSlider],{animated:true});
+
+var distance = 0;
+toolbarSlider.addEventListener('change',function(e) {
+    distance_label.text = 'Within ' + e.value.toFixed(1) + ' mile';
+    distance = e.value.toFixed(1);  
+});
+
+toolbarSlider.addEventListener('touchend',function(e) {
+
+	if(Titanium.Geolocation.locationServicesEnabled){
+		Titanium.Geolocation.getCurrentPosition(function(e){    
+		    if(!e.success || e.error){
+		        Ti.API.error(e.error);
+		        return;
+		    }
+		    var coords = e.coords;
+			var lat = e.coords.latitude;
+		    var lng = e.coords.longitude;
+			Ti.App.fireEvent('show_indicator');
+			loadFeed(url, lat, lng, distance);
+			setTimeout(endReloading, 2000);
+		});
+	}
+    
+});
 
 function getTableData(data){
 	var tableData=[];
@@ -351,7 +395,7 @@ function displayItems(file){
 	}
 }
 
-function loadFeed(url, filename){
+function loadFeed(url, lat, lng, dis){
 	if(!Ti.Network.online){	  	
 		noNetworkAlert();
 	}
@@ -374,7 +418,8 @@ function loadFeed(url, filename){
 			Titanium.API.info("onerror");
 		}		
     });
-    url = url + '?email=' + Ti.App.Properties.getString('email') + '&password=' + Ti.App.Properties.getString('password')
+    //url = url + '?email=' + Ti.App.Properties.getString('email') + '&password=' + Ti.App.Properties.getString('password')
+    url = url + '?lat=' + lat + '&lng=' + lng + '&distance=' + dis
     xhr.open("GET", url);
     xhr.send();
 }
@@ -423,8 +468,20 @@ cc.tableView.addEventListener('scrollEnd', function(e){
 });
 
 function beginReloading() {
-  loadFeed(url);
-  setTimeout(endReloading, 2000);
+	if(Titanium.Geolocation.locationServicesEnabled){
+		Titanium.Geolocation.getCurrentPosition(function(e){    
+		    if(!e.success || e.error){
+		        Ti.API.error(e.error);
+		        return;
+		    }
+		    var coords = e.coords;
+			var lat = e.coords.latitude;
+		    var lng = e.coords.longitude;
+			//Ti.App.fireEvent('show_indicator');
+			loadFeed(url, lat, lng, distance);
+			setTimeout(endReloading, 2000);
+		});
+	}
 }
 
 function endReloading() {
@@ -435,13 +492,33 @@ function endReloading() {
 }
 
 Ti.App.addEventListener('snaps_loadFeed', function(e) {
-  Ti.App.fireEvent('show_indicator');	
-  loadFeed(url);
-  setTimeout(endReloading, 2000);
+	if(Titanium.Geolocation.locationServicesEnabled){
+		Titanium.Geolocation.getCurrentPosition(function(e){    
+		    if(!e.success || e.error){
+		        Ti.API.error(e.error);
+		        return;
+		    }
+		    var coords = e.coords;
+			var lat = e.coords.latitude;
+		    var lng = e.coords.longitude;
+			Ti.App.fireEvent('show_indicator');
+			loadFeed(url, lat, lng, distance);
+			setTimeout(endReloading, 2000);
+		});
+	}
 });
 
-if (isLogin()) {
-	Ti.App.fireEvent('show_indicator');
-	loadFeed(url);
-	setTimeout(endReloading, 2000);
+if(Titanium.Geolocation.locationServicesEnabled){
+	Titanium.Geolocation.getCurrentPosition(function(e){    
+	    if(!e.success || e.error){
+	        Ti.API.error(e.error);
+	        return;
+	    }
+	    var coords = e.coords;
+		var lat = e.coords.latitude;
+	    var lng = e.coords.longitude;
+		Ti.App.fireEvent('show_indicator');
+		loadFeed(url, lat, lng, distance);
+		setTimeout(endReloading, 2000);
+	});
 }

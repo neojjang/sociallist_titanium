@@ -19,6 +19,20 @@ cc.win.orientationModes = [
 
 cc.win.layout = 'vertical';
 
+var lat;
+var lng;
+if(Titanium.Geolocation.locationServicesEnabled){
+	Titanium.Geolocation.getCurrentPosition(function(e){    
+	    if(!e.success || e.error){
+	        Ti.API.error(e.error);
+	        return;
+	    }
+	    var coords = e.coords;
+		lat = e.coords.latitude;
+	    lng = e.coords.longitude;				
+	});
+}
+
 function uploadToServer(image) {
 	
 	if(!Ti.Network.online){	  	
@@ -63,11 +77,13 @@ function uploadToServer(image) {
 		
 		Ti.API.info(textArea.value);
 		Ti.API.info(pricetext.value);
-			
+					
 		xhr.send({
 			photo:image, 
 			title:textArea.value, 
-			price:pricetext.value, 
+			price:pricetext.value,
+			lat:lat,
+			lng:lng,  
 			email:Ti.App.Properties.getString('email'),
 		    password:Ti.App.Properties.getString('password')
 		});
@@ -116,7 +132,7 @@ var titleview = Titanium.UI.createView({
 
 var titlelabel = Titanium.UI.createLabel({
 	text:'Photo Title',
-	font:{fontSize:16},
+	font:{fontSize:15},
 	left:20,
 	width:Ti.Platform.displayCaps.platformWidth,	
 	color:'#ffffff'	
@@ -132,7 +148,7 @@ var textArea = Ti.UI.createTextField(
         top:10,
 		left:40,
 		right:40,
-        font:{fontSize:17},
+        font:{fontSize:16},
 		textAlign:'left',
         padding:20,
         keyboardType: Titanium.UI.KEYBOARD_DEFAULT,
@@ -144,14 +160,14 @@ var textArea = Ti.UI.createTextField(
 body.add(textArea);
 
 var priceview = Titanium.UI.createView({	
-	top:0,
+	top:10,
 	height:Ti.Platform.displayCaps.platformHeight * 0.05,
 	backgroundColor: '#555'
 });
 
 var pricelabel = Titanium.UI.createLabel({
-	text:'price',
-	font:{fontSize:16},
+	text:'Price',
+	font:{fontSize:15},
 	left:20,	
 	color:'#ffffff'	
 });
@@ -161,13 +177,13 @@ body.add(priceview);
 var pricetext = Ti.UI.createTextField(
     {
 		hintText:'Enter price',
-        height:Ti.Platform.displayCaps.platformHeight * 0.1,
+        height:Ti.Platform.displayCaps.platformHeight * 0.08,
         width:Ti.Platform.displayCaps.platformWidth * 0.8,
         top:10,
         font:{fontSize:16},
 		textAlign:'left',
         padding:20,
-        keyboardType: Titanium.UI.KEYBOARD_DEFAULT,
+        keyboardType: Titanium.UI.KEYBOARD_NUMBERS_PUNCTUATION,
         returnKeyType: Titanium.UI.RETURNKEY_DONE,
         borderStyle: Titanium.UI.INPUT_BORDERSTYLE_ROUNDED,
         suppressReturn:true		        
@@ -189,14 +205,14 @@ var imageView = Ti.UI.createImageView({
 body.add(imageView);
 
 var progressview = Titanium.UI.createView({
-	top: 30,
-	height:Ti.Platform.displayCaps.platformHeight * 0.05,
+	top: 10,
+	height:Ti.Platform.displayCaps.platformHeight * 0.03,
 	width:Ti.Platform.displayCaps.platformWidth,
 	//bottom:90,	
 	backgroundColor: '#111111'
 });
 var progresslavel = Titanium.UI.createLabel({
-	font:{fontSize:15},
+	font:{fontSize:13},
 	left:20,
 	color:'#ffffff'
 });
@@ -218,7 +234,7 @@ var cancelView = Titanium.UI.createView({
         backgroundColor:'#999',
         height:Ti.Platform.displayCaps.platformHeight * 0.1,
         width:Ti.Platform.displayCaps.platformWidth * 0.35,
-        left:20,
+        left:30,
         borderRadius:10
 });
 
@@ -237,13 +253,18 @@ cancelLabel.addEventListener(
     'click',
     function () {
                 //Are you Sure? yes or no
-                var homewin = Titanium.UI.createWindow({
-                        url:'../tab/snaps.js',
-                        barColor:useThisBarColor,
-                    backgroundColor:(Ti.Platform.osname == 'android') ? '#fff' :useThisBackgroundColor,
-                        title:'Feed'
-                });
-                Ti.UI.currentTab.open(homewin, { animated : true});
+                //var homewin = Titanium.UI.createWindow({
+                //        url:'../tab/snaps.js',
+                //        barColor:useThisBarColor,
+                //    backgroundColor:(Ti.Platform.osname == 'android') ? '#fff' :useThisBackgroundColor,
+                //        title:'Feed'
+                //});
+                //Ti.UI.currentTab.open(homewin, { animated : true});
+
+				Ti.App.fireEvent('hide_indicator',{});
+				Titanium.UI.currentWindow.close();
+				tabGroup.setActiveTab(0);
+				Ti.App.fireEvent('snaps_loadFeed',{});
     }
 );
 
@@ -275,7 +296,7 @@ var doneView = Titanium.UI.createView({
 	backgroundColor:'#52A829',
 	height:Ti.Platform.displayCaps.platformHeight * 0.1,
 	width:Ti.Platform.displayCaps.platformWidth * 0.35,
-	right:20,
+	left:30,
 	borderRadius:10
 });
 

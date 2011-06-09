@@ -422,18 +422,20 @@ cc.tableView.addEventListener('scroll', function(e){
 });
 cc.tableView.addEventListener('scrollEnd', function(e){
 	if(pulling && !reloading && e.contentOffset.y <= -60.0){
-		reloading = true;
-		pulling = false;
-		Ti.App.fireEvent('show_indicator');
-		refresh_label.text = 'reloading...';
-		cc.tableView.setContentInsets({top:60},{animated:true});
-		beginReloading();
+		if (isLogin()) {	
+		  reloading = true;
+		  pulling = false;
+		  Ti.App.fireEvent('show_indicator');
+		  refresh_label.text = 'reloading...';
+		  cc.tableView.setContentInsets({top:60},{animated:true});
+		  beginReloading();
+	    }
 	}
 });
 
-function beginReloading() {
-  loadFeed(url);
-  setTimeout(endReloading, 2000);
+function beginReloading() { 
+    loadFeed(url);
+    setTimeout(endReloading, 2000);  
 }
 
 function endReloading() {
