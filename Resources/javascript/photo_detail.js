@@ -14,6 +14,8 @@ var snap_id = cc.win.snapId;
 var user_id = cc.win.userId;
 var user_name = cc.win.userName;
 var price = cc.win.price;
+var lat = cc.win.lat;
+var lng = cc.win.lng;
 var snap_title = cc.win.snapTitle;
 var created_at = cc.win.createdAt;
 
@@ -101,8 +103,8 @@ var messagelabel = Titanium.UI.createLabel({
 messageContainer.add(messagelabel);
 
 var targetView = Titanium.Map.createAnnotation({
-        latitude:37.390749,
-        longitude:-122.081651,
+        latitude:lat,
+        longitude:lng,
         title:snap_title,
         subtitle:user_name,
         pincolor:Titanium.Map.ANNOTATION_RED
@@ -110,7 +112,7 @@ var targetView = Titanium.Map.createAnnotation({
 
 var mapview = Titanium.Map.createView({
         mapType: Titanium.Map.STANDARD_TYPE,
-        region: {latitude:37.390749, longitude:-122.081651, latitudeDelta:0.01, longitudeDelta:0.01},
+        region: {latitude:lat, longitude:lng, latitudeDelta:0.01, longitudeDelta:0.01},
         animate:true,
         regionFit:true,
         userLocation:true,

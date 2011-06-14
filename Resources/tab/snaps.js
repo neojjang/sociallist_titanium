@@ -130,6 +130,8 @@ function getTableData(data){
 					userId: data[e.source.row].snap.user_id,
 					userName: data[e.source.row].snap.user_name,
 					price: data[e.source.row].snap.price,
+					lat: data[e.source.row].snap.lat,
+					lng: data[e.source.row].snap.lng,
 					snapTitle:	data[e.source.row].snap.title,
 					createdAt: data[e.source.row].snap.created_at	
 				});
