@@ -8,6 +8,21 @@ if(Ti.Platform.osname == 'android') {
 var cc ={win:Ti.UI.currentWindow};
 var tab = cc.win.tab;
 
+function formatDate()
+{
+	var date = new Date;
+	var datestr = date.getMonth()+'/'+date.getDate()+'/'+date.getFullYear();
+	if (date.getHours()>=12)
+	{
+		datestr+=' '+(date.getHours()==12 ? date.getHours() : date.getHours()-12)+':'+date.getMinutes()+' PM';
+	}
+	else
+	{
+		datestr+=' '+date.getHours()+':'+date.getMinutes()+' AM';
+	}
+	return datestr;
+}
+
 //if(!isLogin()){
 //	Ti.API.info('welcome window open');
 
@@ -426,50 +441,98 @@ function loadFeed(url, lat, lng, dis){
     xhr.send();
 }
 
-var refresh_view = Ti.UI.createView({
-	backgroundColor: "#000",
-	height:55
+//var refresh_view = Ti.UI.createView({
+//	backgroundColor: "#000",
+//	height:55
+//});
+
+//var refresh_label = Ti.UI.createLabel({
+//  text: "ひっぱると更新",
+//  bottom: 30,
+//  height: "auto",
+//  color: "#576c89",
+//  textAlign: "center",
+//  font: {
+//    fontSize: 13,
+//    fontWeight: "bold"
+//  }
+//});	
+
+//refresh_view.add(refresh_label);
+
+var border = Ti.UI.createView({
+	backgroundColor:"#576c89",
+	height:2,
+	bottom:0
 });
 
-var refresh_label = Ti.UI.createLabel({
-  text: "ひっぱると更新",
-  bottom: 30,
-  height: "auto",
-  color: "#576c89",
-  textAlign: "center",
-  font: {
-    fontSize: 13,
-    fontWeight: "bold"
-  }
-});	
+var tableHeader = Ti.UI.createView({
+	backgroundColor:"#e2e7ed",
+	width:320,
+	height:60
+});
 
-refresh_view.add(refresh_label);
-cc.tableView.headerPullView = refresh_view;
+tableHeader.add(border);
+
+var arrow = Ti.UI.createView({
+	backgroundImage:"../images/whiteArrow.png",
+	width:23,
+	height:60,
+	bottom:10,
+	left:20
+});
+
+var statusLabel = Ti.UI.createLabel({
+	text:"Pull to reload",
+	left:55,
+	width:200,
+	bottom:30,
+	height:"auto",
+	color:"#576c89",
+	textAlign:"center",
+	font:{fontSize:13,fontWeight:"bold"},
+	shadowColor:"#999",
+	shadowOffset:{x:0,y:1}
+});
+
+var lastUpdatedLabel = Ti.UI.createLabel({
+	text:"Last Updated: "+formatDate(),
+	left:55,
+	width:200,
+	bottom:15,
+	height:"auto",
+	color:"#576c89",
+	textAlign:"center",
+	font:{fontSize:12},
+	shadowColor:"#999",
+	shadowOffset:{x:0,y:1}
+});
+
+var miniactInd = Titanium.UI.createActivityIndicator({
+	left:20,
+	bottom:13,
+	width:30,
+	height:30
+});
+
+var navActInd = Titanium.UI.createActivityIndicator();
+cc.win.setRightNavButton(navActInd);
+
+tableHeader.add(arrow);
+tableHeader.add(statusLabel);
+tableHeader.add(lastUpdatedLabel);
+tableHeader.add(miniactInd);
+
+cc.tableView.headerPullView = tableHeader;
 
 var pulling = false;
 var reloading = false;
-cc.tableView.addEventListener('scroll', function(e){
-	var offset = e.contentOffset.y;
-	if(offset <= -60.0 && !pulling){
-		pulling = true;
-		refresh_label.text = 'はなすとreload!';
-	} else if(pulling && offset > -60.0 && offset < 0) {
-		pulling = false;
-		refresh_label.text = 'ひっぱるとreload!';
-	}
-});
-cc.tableView.addEventListener('scrollEnd', function(e){
-	if(pulling && !reloading && e.contentOffset.y <= -60.0){
-		reloading = true;
-		pulling = false;
-		Ti.App.fireEvent('show_indicator');
-		refresh_label.text = 'reloading...';
-		cc.tableView.setContentInsets({top:60},{animated:true});
-		beginReloading();
-	}
-});
+var updating = false;
+var loadingRow = Ti.UI.createTableViewRow({title:"Loading..."});
+var lastRow = 10;
 
-function beginReloading() {
+function beginReloading()
+{
 	if(Titanium.Geolocation.locationServicesEnabled){
 		Titanium.Geolocation.getCurrentPosition(function(e){    
 		    if(!e.success || e.error){
@@ -486,12 +549,153 @@ function beginReloading() {
 	}
 }
 
-function endReloading() {
-  cc.tableView.setContentInsets({top:0},{animated:true});
-  reloading = false;
-  reloadLabel.text = "ひっぱると更新";
-  Ti.App.fireEvent('hide_indicator',{});
+function endReloading()
+{
+	// simulate loading
+	//for (var c=lastRow;c<lastRow+10;c++)
+	//{
+	//	cc.tableView.appendRow({title:"Row "+c});
+	//}
+	//lastRow += 10;
+
+	// when you're done, just reset
+	cc.tableView.setContentInsets({top:0},{animated:true});
+	reloading = false;
+	lastUpdatedLabel.text = "Last Updated: "+formatDate();
+	statusLabel.text = "Pull down to refresh...";
+	miniactInd.hide();
+	Ti.App.fireEvent('hide_indicator',{});
+	arrow.show();
 }
+
+function beginUpdate()
+{
+	updating = true;
+	navActInd.show();
+
+	//cc.tableView.appendRow(loadingRow);
+
+	// just mock out the reload
+	setTimeout(endUpdate,2000);
+}
+
+function endUpdate()
+{
+	updating = false;
+
+	//cc.tableView.deleteRow(lastRow,{animationStyle:Titanium.UI.iPhone.RowAnimationStyle.NONE});
+
+	// simulate loading
+	//for (var c=lastRow;c<lastRow+10;c++)
+	//{
+	//	tableView.appendRow({title:"Row "+(c+1)},{animationStyle:Titanium.UI.iPhone.RowAnimationStyle.NONE});
+	//}
+	//lastRow += 10;
+
+	// just scroll down a bit to the new rows to bring them into view
+	//cc.tableView.scrollToIndex(lastRow-9,{animated:true,position:Ti.UI.iPhone.TableViewScrollPosition.BOTTOM});
+
+	navActInd.hide();
+}
+
+var lastDistance = 0;
+
+cc.tableView.addEventListener('scroll',function(e)
+{
+	var offset = e.contentOffset.y;
+	var height = e.size.height;
+	var total = offset + height;
+	var theEnd = e.contentSize.height;
+	var distance = theEnd - total;
+	
+	if (offset <= -65.0 && !pulling)
+	{
+		var t = Ti.UI.create2DMatrix();
+		t = t.rotate(-180);
+		pulling = true;
+		arrow.animate({transform:t,duration:180});
+		statusLabel.text = "Release to refresh...";
+	}
+	else if (pulling && offset > -65.0 && offset < 0)
+	{
+		pulling = false;
+		var t = Ti.UI.create2DMatrix();
+		arrow.animate({transform:t,duration:180});
+		statusLabel.text = "Pull down to refresh...";
+	}
+	else if (distance < lastDistance)
+	{
+		// adjust the % of rows scrolled before we decide to start fetching
+		var nearEnd = theEnd * .75;
+
+		if (!updating && (total >= nearEnd))
+		{
+			beginUpdate();
+		}
+	}
+	lastDistance = distance;	
+});
+
+cc.tableView.addEventListener('scrollEnd',function(e)
+{
+	if (pulling && !reloading && e.contentOffset.y <= -65.0)
+	{
+		reloading = true;
+		pulling = false;
+		arrow.hide();
+		miniactInd.show();
+		Ti.App.fireEvent('show_indicator');
+		statusLabel.text = "Reloading...";
+		cc.tableView.setContentInsets({top:60},{animated:true});
+		arrow.transform=Ti.UI.create2DMatrix();
+		beginReloading();
+	}
+});
+
+//cc.tableView.addEventListener('scroll', function(e){
+//	var offset = e.contentOffset.y;
+//	if(offset <= -60.0 && !pulling){
+//		pulling = true;
+//		refresh_label.text = 'はなすとreload!';
+//	} else if(pulling && offset > -60.0 && offset < 0) {
+//		pulling = false;
+//		refresh_label.text = 'ひっぱるとreload!';
+//	}
+//});
+//cc.tableView.addEventListener('scrollEnd', function(e){
+//	if(pulling && !reloading && e.contentOffset.y <= -60.0){
+//		reloading = true;
+//		pulling = false;
+//		Ti.App.fireEvent('show_indicator');
+//		refresh_label.text = 'reloading...';
+//		cc.tableView.setContentInsets({top:60},{animated:true});
+//		beginReloading();
+//	}
+//});
+
+//function beginReloading() {
+//	if(Titanium.Geolocation.locationServicesEnabled){
+//		Titanium.Geolocation.getCurrentPosition(function(e){    
+//		    if(!e.success || e.error){
+//		        Ti.API.error(e.error);
+//		        return;
+//		    }
+//		    var coords = e.coords;
+//			var lat = e.coords.latitude;
+//		    var lng = e.coords.longitude;
+//			//Ti.App.fireEvent('show_indicator');
+//			loadFeed(url, lat, lng, distance);
+//			setTimeout(endReloading, 2000);
+//		});
+//	}
+//}
+
+//function endReloading() {
+//  cc.tableView.setContentInsets({top:0},{animated:true});
+//  reloading = false;
+//  reloadLabel.text = "ひっぱると更新";
+//  Ti.App.fireEvent('hide_indicator',{});
+//}
 
 Ti.App.addEventListener('snaps_loadFeed', function(e) {
 	if(Titanium.Geolocation.locationServicesEnabled){

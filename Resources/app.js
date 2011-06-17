@@ -89,51 +89,51 @@ win3.tab = tab3;
 win3.tabGroup = tabGroup;
 
 //Tab4(People)
-var win4 = Titanium.UI.createWindow({
-	url:'./tab/people.js',  
-    title:'People',
-    backgroundColor:useThisBackgroundColor,
-	barColor:useThisBarColor
-});
-win4.addEventListener('click', function(e){
-	win1.orientationModes = [
-			Ti.UI.PORTRAIT,
-			Ti.UI.UPSIDE_PORTRAIT
-		]; 
-});
-var tab4 = Titanium.UI.createTab({  
-    icon:'./images/people.png',
-	backgroundColor:'#000000',
-    title:'People',
-    window:win4
-});
-win4.tab = tab4;
+//var win4 = Titanium.UI.createWindow({
+//	url:'./tab/people.js',  
+//    title:'People',
+//    backgroundColor:useThisBackgroundColor,
+//	barColor:useThisBarColor
+//});
+//win4.addEventListener('click', function(e){
+//	win1.orientationModes = [
+//			Ti.UI.PORTRAIT,
+//			Ti.UI.UPSIDE_PORTRAIT
+//		]; 
+//});
+//var tab4 = Titanium.UI.createTab({  
+//    icon:'./images/people.png',
+//	backgroundColor:'#000000',
+//    title:'People',
+//    window:win4
+//});
+//win4.tab = tab4;
 
 //Tab5(Settings)
-var win5 = Titanium.UI.createWindow({
-	url:'./tab/settings.js',  
-    title:'Settings',
-    backgroundColor:useThisBackgroundColor,
-	barColor:useThisBarColor
-});
-win5.addEventListener('click', function(e){
-	win1.orientationModes = [
-			Ti.UI.PORTRAIT,
-			Ti.UI.UPSIDE_PORTRAIT
-		]; 
-});
-var tab5 = Titanium.UI.createTab({  
-    icon:'./images/settings.png',
-	backgroundColor:'#000000',
-    title:'Settings',
-    window:win5
-});
-win5.tab = tab5;
+//var win5 = Titanium.UI.createWindow({
+//	url:'./tab/settings.js',  
+//    title:'Settings',
+//    backgroundColor:useThisBackgroundColor,
+//	barColor:useThisBarColor
+//});
+//win5.addEventListener('click', function(e){
+//	win1.orientationModes = [
+//			Ti.UI.PORTRAIT,
+//			Ti.UI.UPSIDE_PORTRAIT
+//		]; 
+//});
+//var tab5 = Titanium.UI.createTab({  
+//    icon:'./images/settings.png',
+//	backgroundColor:'#000000',
+//    title:'Settings',
+//    window:win5
+//});
+//win5.tab = tab5;
 
 tabGroup.addTab(tab1);  
-tabGroup.addTab(tab2);
 tabGroup.addTab(tab3);
-tabGroup.addTab(tab4);
-tabGroup.addTab(tab5);  
+tabGroup.addTab(tab2);
+//tabGroup.addTab(tab4);
+//tabGroup.addTab(tab5);  
 tabGroup.open();
 
